@@ -1,8 +1,8 @@
 /* styles.css - Responsive Portfolio for doqa.io */
 
 :root {
-    --primary: #1a73e8;
-    --background: #f9f9f9;
+    --primary:rgb(231, 97, 97);
+    --background: #f5e9dc;
     --text: #222;
     --accent: #ffb300;
 }
@@ -21,7 +21,7 @@ body {
 }
 
 .navbar {
-    background: #fff;
+    background: #f5e9dc;
     border-bottom: 1px solid #eee;
     position: sticky;
     top: 0;
@@ -38,6 +38,12 @@ body {
     font-weight: bold;
     color: var(--primary);
     text-decoration: none;
+}
+.logo-img {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    margin-right: 0.5rem;
 }
 .nav-links {
     list-style: none;
@@ -64,7 +70,8 @@ body {
 }
 
 .hero {
-    background: linear-gradient(90deg, var(--primary) 60%, var(--accent) 100%);
+    background-color: var(--primary);
+    /*background: linear-gradient(90deg, var(--primary) 60%, var(--accent) 100%);*/
     color: #fff;
     padding: 4rem 0 2rem 0;
     text-align: center;
@@ -128,7 +135,7 @@ body {
 
 .about-section, .contact-section {
     padding: 2rem 0;
-    background: #fff;
+    background: #f5e9dc;
     margin-top: 2rem;
     border-radius: 10px;
     box-shadow: 0 1px 4px rgba(0,0,0,0.04);
