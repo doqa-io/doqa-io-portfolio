@@ -4,54 +4,141 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Portfolio - doqa.io</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Sora:wght@600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
     <link rel="icon" type="image/png" href="./src/logo_doqa.webp">
 </head>
 <body>
     <nav class="navbar">
         <div class="container">
-            <a href="#"><img src="./src/logo_doqa.png" alt="doqa.io Logo" class="logo-img"></a>
+            <a href="#" class="nav-brand"><img src="./src/logo_doqa.png" alt="doqa.io Logo" class="logo-img"></a>
             <ul class="nav-links">
-                <li><a href="#projects">Projects</a></li>
-                <li><a href="#about">About</a></li>
-                <li><a href="#contact">Contact</a></li>
+                <li><a href="#projects" data-nav>Projects</a></li>
+                <li><a href="#about" data-nav>About</a></li>
+                <li><a href="#contact" data-nav>Contact</a></li>
             </ul>
-            <button class="menu-toggle" aria-label="Open menu">☰</button>
+            <div class="nav-actions">
+                <button class="theme-toggle" aria-label="Toggle dark mode" title="Toggle dark mode">
+                    <span class="theme-icon">🌙</span>
+                </button>
+                <button class="menu-toggle" aria-label="Open menu">☰</button>
+            </div>
         </div>
     </nav>
+
     <header class="hero">
+        <div class="hero-bg"></div>
         <div class="container">
-            <h1>Welcome to my Portfolio</h1>
-            <p>Showcasing open-source projects and live demos from doqa-io</p>
+            <h1 class="reveal">Building Open-Source Tools & Demos</h1>
+            <p class="reveal">Explore live experiments, utility libraries, and creative projects from the doqa-io organization.</p>
+            <a href="#projects" class="btn-cta reveal">View Projects ↓</a>
         </div>
     </header>
+
     <main>
         <section id="projects" class="projects-section">
             <div class="container">
-                <h2>Featured Projects</h2>
+                <h2 class="reveal">Featured Projects</h2>
                 <div id="project-grid" class="project-grid">
-                    <!-- Projects will be dynamically loaded here -->
+                    <!-- Skeleton placeholders shown while loading -->
+                    <div class="project-card skeleton-card" aria-hidden="true"><div class="skeleton-title"></div><div class="skeleton-desc"></div><div class="skeleton-desc short"></div><div class="skeleton-links"></div></div>
+                    <div class="project-card skeleton-card" aria-hidden="true"><div class="skeleton-title"></div><div class="skeleton-desc"></div><div class="skeleton-desc short"></div><div class="skeleton-links"></div></div>
+                    <div class="project-card skeleton-card" aria-hidden="true"><div class="skeleton-title"></div><div class="skeleton-desc"></div><div class="skeleton-desc short"></div><div class="skeleton-links"></div></div>
                 </div>
             </div>
         </section>
+
         <section id="about" class="about-section">
             <div class="container">
-                <h2>About</h2>
-                <p>This portfolio features repositories from the doqa-io organization and their live demos hosted on doqa.io.</p>
+                <h2 class="reveal">About doqa.io</h2>
+                <p class="reveal">We build and share open-source tools, creative experiments, and developer utilities. Our projects span web technologies, AI/ML, and interactive demos — all freely available on GitHub.</p>
+                <h3 class="reveal">Technologies &amp; Tools</h3>
+                <div class="skills-grid reveal">
+                    <div class="skill-item">
+                        <span class="skill-icon">⚡</span>
+                        <span>JavaScript</span>
+                    </div>
+                    <div class="skill-item">
+                        <span class="skill-icon">🐍</span>
+                        <span>Python</span>
+                    </div>
+                    <div class="skill-item">
+                        <span class="skill-icon">🎨</span>
+                        <span>CSS / Tailwind</span>
+                    </div>
+                    <div class="skill-item">
+                        <span class="skill-icon">🤖</span>
+                        <span>AI / ML</span>
+                    </div>
+                    <div class="skill-item">
+                        <span class="skill-icon">🌐</span>
+                        <span>Web APIs</span>
+                    </div>
+                    <div class="skill-item">
+                        <span class="skill-icon">📦</span>
+                        <span>Node.js</span>
+                    </div>
+                    <div class="skill-item">
+                        <span class="skill-icon">🗄️</span>
+                        <span>Databases</span>
+                    </div>
+                    <div class="skill-item">
+                        <span class="skill-icon">🚀</span>
+                        <span>CI / CD</span>
+                    </div>
+                </div>
             </div>
         </section>
+
         <section id="contact" class="contact-section">
             <div class="container">
-                <h2>Contact</h2>
-                <p>Get in touch via <a href="mailto:contact@doqa.io">contact@doqa.io</a></p>
+                <h2 class="reveal">Get in Touch</h2>
+                <p class="reveal">Have a question, idea, or want to collaborate? Reach out anytime.</p>
+                <div class="contact-links reveal">
+                    <a href="mailto:contact@doqa.io" class="contact-link">
+                        <span class="contact-icon">✉️</span>
+                        <span>contact@doqa.io</span>
+                    </a>
+                    <a href="https://github.com/doqa-io" target="_blank" rel="noopener" class="contact-link">
+                        <span class="contact-icon">💻</span>
+                        <span>GitHub</span>
+                    </a>
+                </div>
             </div>
         </section>
     </main>
+
     <footer class="footer">
         <div class="container">
-            <p>&copy; 2025 doqa.io. All rights reserved.</p>
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <img src="./src/logo_doqa.png" alt="doqa.io" class="footer-logo">
+                    <p>Open-source tools &amp; experiments.</p>
+                </div>
+                <div class="footer-links">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="#projects">Projects</a></li>
+                        <li><a href="#about">About</a></li>
+                        <li><a href="#contact">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="footer-social">
+                    <h4>Connect</h4>
+                    <ul>
+                        <li><a href="https://github.com/doqa-io" target="_blank" rel="noopener">GitHub</a></li>
+                        <li><a href="mailto:contact@doqa.io">Email</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; <span id="year"></span> doqa.io. All rights reserved.</p>
+            </div>
         </div>
     </footer>
+
     <script src="main.js"></script>
 </body>
 </html>
