@@ -33,3 +33,22 @@ src/              # Images and assets
 
 ## License
 MIT
+
+## Tests
+
+Suite de non-régression [Playwright](https://playwright.dev/) (Chromium, bureau et mobile) :
+
+```bash
+npm ci
+npx playwright install chromium
+npm test              # site servi en local, API GitHub et polices interceptées (aucun réseau)
+npm run test:report   # ouvrir le rapport HTML
+npm run test:live     # hors CI : vérifie les liens « Live Demo » en production
+```
+
+- `tests/portfolio.spec.js` : chargement, cartes projets, échec de l'API GitHub, thème, menu mobile, accessibilité (axe, WCAG A/AA).
+- `tests/live-links.spec.js` : liens « Live Demo » de la production (tag `@live`).
+- `tests/fixtures/github-repos.json` : réponse figée de l'API GitHub (12/11/2026).
+- Les tests marqués `test.fail()` documentent un défaut connu (numéro du constat de recette). Quand le défaut est corrigé, la suite échoue en « passed unexpectedly » : retirer alors le `test.fail()`.
+
+La CI (`.github/workflows/tests.yml`) lance la suite sur chaque pull request et chaque push sur `main`, et publie le rapport HTML en artefact.
