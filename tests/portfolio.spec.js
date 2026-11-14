@@ -4,7 +4,7 @@
 // le test « passe de manière inattendue » et la suite échoue : retirer alors le test.fail().
 import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
-import { isolate, realCards, cardFor, revealAll, repos, shownRepos, EXCLUDED } from './helpers.js';
+import { isolate, realCards, cardFor, revealAll, projects } from './helpers.js';
 
 const isMobile = (testInfo) => testInfo.project.name === 'mobile';
 const FAILED = 'Failed to load projects. Please try again later.';
@@ -16,7 +16,7 @@ test.describe('Chargement', () => {
     page.on('pageerror', (err) => errors.push(err.message));
     await isolate(page);
     await page.goto('/');
-    await expect(realCards(page)).toHaveCount(shownRepos.length);
+    await expect(realCards(page)).toHaveCount(projects.length);
     expect(errors).toEqual([]);
   });
 
@@ -28,52 +28,68 @@ test.describe('Chargement', () => {
     await expect(page.locator('#year')).toHaveText(String(new Date().getFullYear()));
   });
 
-  test("constat #6 : aucune requête vers un tiers autre que l'API GitHub", async ({ page }) => {
+  test('constat #6 : aucune requête vers un tiers', async ({ page }) => {
     test.fail(true, 'Constat #6 : Google Fonts chargé depuis fonts.googleapis.com / fonts.gstatic.com');
     const thirdParty = await isolate(page);
     await page.goto('/');
-    await expect(realCards(page)).toHaveCount(shownRepos.length);
-    expect([...new Set(thirdParty)].filter((h) => h !== 'api.github.com')).toEqual([]);
+    await expect(realCards(page)).toHaveCount(projects.length);
+    expect([...new Set(thirdParty)]).toEqual([]);
   });
 });
 
 test.describe('Cartes projets', () => {
-  test('une carte par dépôt public, hors dépôts exclus', async ({ page }) => {
-    await isolate(page);
-    await page.goto('/');
-    await expect(realCards(page)).toHaveCount(shownRepos.length);
-    await expect(page.locator('.skeleton-card')).toHaveCount(0);
-    const titles = await page.locator('#project-grid .project-title').allTextContents();
-    expect(titles).toEqual(shownRepos.map((r) => r.name));
-    for (const name of EXCLUDED) expect(titles).not.toContain(name);
-  });
-
-  test('une carte affiche langue, description et liens corrects', async ({ page }) => {
-    await isolate(page);
-    await page.goto('/');
-    const repo = shownRepos.find((r) => r.language && r.description);
-    const card = cardFor(page, repo.name);
-    await expect(card.locator('.language-badge')).toHaveText(repo.language);
-    await expect(card.locator('.project-desc')).toHaveText(repo.description);
-    await expect(card.getByRole('link', { name: 'GitHub' })).toHaveAttribute('href', repo.html_url);
-    await expect(card.getByRole('link', { name: 'Live Demo' })).toHaveAttribute('href', `https://doqa.io/${repo.name}`);
-    for (const link of await card.getByRole('link').all()) {
-      await expect(link).toHaveAttribute('target', '_blank');
-      await expect(link).toHaveAttribute('rel', /noopener/);
+  test('projects.json : chaque projet a un nom unique, une description et un dépôt doqa-io', () => {
+    expect(projects.length).toBeGreaterThan(0);
+    expect(new Set(projects.map((p) => p.name)).size).toBe(projects.length);
+    for (const p of projects) {
+      expect(p.description, p.name).toMatch(/\S/);
+      expect(p.repo, p.name).toBe(`https://github.com/doqa-io/${p.name}`);
+      for (const key of ['tests', 'demo']) if (p[key]) expect(p[key], `${p.name}.${key}`).toMatch(/^https:\/\//);
     }
   });
 
-  test('description absente : texte de remplacement', async ({ page }) => {
-    const repo = shownRepos.find((r) => !r.description);
-    test.skip(!repo, 'aucun dépôt sans description dans la fixture');
+  test('une carte par projet de projects.json, dans le même ordre', async ({ page }) => {
     await isolate(page);
     await page.goto('/');
-    await expect(cardFor(page, repo.name).locator('.project-desc')).toHaveText('No description provided.');
+    await expect(realCards(page)).toHaveCount(projects.length);
+    await expect(page.locator('.skeleton-card')).toHaveCount(0);
+    const titles = await page.locator('#project-grid .project-title').allTextContents();
+    expect(titles).toEqual(projects.map((p) => p.name));
   });
 
-  test("le contenu des dépôts est échappé (pas d'injection HTML)", async ({ page }) => {
-    const evil = [{ ...repos[0], name: 'evil', description: '<img src=x onerror="window.__xss=1">' }];
-    await isolate(page, { github: (route) => route.fulfill({ json: evil }) });
+  test('chaque carte affiche langue, description, catégorie et uniquement ses liens', async ({ page }) => {
+    await isolate(page);
+    await page.goto('/');
+    for (const p of projects) {
+      const card = cardFor(page, p.name);
+      await expect(card.locator('.language-badge')).toHaveText(p.language);
+      await expect(card.locator('.project-desc')).toHaveText(p.description);
+      await expect(card.locator('.project-meta')).toHaveText(p.category);
+      const expected = [['GitHub', p.repo], ['Tests', p.tests], ['Live Demo', p.demo]].filter(([, url]) => url);
+      await expect(card.getByRole('link')).toHaveText(expected.map(([label]) => label));
+      for (const [label, url] of expected) {
+        const link = card.getByRole('link', { name: label });
+        await expect(link).toHaveAttribute('href', url);
+        await expect(link).toHaveAttribute('target', '_blank');
+        await expect(link).toHaveAttribute('rel', /noopener/);
+      }
+    }
+  });
+
+  test('champs facultatifs absents : texte de remplacement, ni badge ni catégorie', async ({ page }) => {
+    const bare = [{ name: 'bare', repo: 'https://github.com/doqa-io/bare' }];
+    await isolate(page, { projectsRoute: (route) => route.fulfill({ json: bare }) });
+    await page.goto('/');
+    const card = cardFor(page, 'bare');
+    await expect(card.locator('.project-desc')).toHaveText('No description provided.');
+    await expect(card.locator('.language-badge')).toHaveCount(0);
+    await expect(card.locator('.project-meta')).toHaveCount(0);
+    await expect(card.getByRole('link')).toHaveText(['GitHub']);
+  });
+
+  test("le contenu de projects.json est échappé (pas d'injection HTML)", async ({ page }) => {
+    const evil = [{ ...projects[0], name: 'evil', description: '<img src=x onerror="window.__xss=1">' }];
+    await isolate(page, { projectsRoute: (route) => route.fulfill({ json: evil }) });
     await page.goto('/');
     await expect(realCards(page)).toHaveCount(1);
     await expect(realCards(page).locator('.project-desc')).toHaveText(evil[0].description);
@@ -82,32 +98,32 @@ test.describe('Cartes projets', () => {
   });
 
   test('liste vide : message « No projects found. »', async ({ page }) => {
-    await isolate(page, { github: (route) => route.fulfill({ json: [] }) });
+    await isolate(page, { projectsRoute: (route) => route.fulfill({ json: [] }) });
     await page.goto('/');
     await expect(page.locator('#project-grid')).toHaveText('No projects found.');
   });
 });
 
-test.describe('API GitHub en échec', () => {
-  test("quota dépassé (403) : message d'échec affiché", async ({ page }) => {
+test.describe('Chargement de projects.json', () => {
+  test("constat #4 corrigé : aucun appel à l'API GitHub, les projets s'affichent quand même", async ({ page }) => {
+    const thirdParty = await isolate(page);
+    await page.goto('/');
+    await expect(realCards(page)).toHaveCount(projects.length);
+    expect(thirdParty).not.toContain('api.github.com');
+  });
+
+  test("fichier absent (404) : message d'échec affiché", async ({ page }) => {
+    await isolate(page, { projectsRoute: (route) => route.fulfill({ status: 404, body: 'Not found' }) });
+    await page.goto('/');
+    await expect(page.locator('#project-grid')).toHaveText(FAILED);
+  });
+
+  test("fichier illisible (JSON invalide) : message d'échec affiché", async ({ page }) => {
     await isolate(page, {
-      github: (route) => route.fulfill({ status: 403, json: { message: 'API rate limit exceeded' } }),
+      projectsRoute: (route) => route.fulfill({ contentType: 'application/json', body: '{oops' }),
     });
     await page.goto('/');
     await expect(page.locator('#project-grid')).toHaveText(FAILED);
-  });
-
-  test("réseau coupé : message d'échec affiché", async ({ page }) => {
-    await isolate(page, { github: (route) => route.abort('internetdisconnected') });
-    await page.goto('/');
-    await expect(page.locator('#project-grid')).toHaveText(FAILED);
-  });
-
-  test("constat #4 : les projets restent visibles sans l'API GitHub", async ({ page }) => {
-    test.fail(true, "Constat #4 : aucun repli statique, la section dépend entièrement de l'API GitHub");
-    await isolate(page, { github: (route) => route.abort('internetdisconnected') });
-    await page.goto('/');
-    await expect(realCards(page).first()).toBeVisible({ timeout: 3000 });
   });
 });
 
@@ -216,7 +232,7 @@ test.describe('Accessibilité', () => {
     await page.emulateMedia({ colorScheme: scheme });
     await isolate(page);
     await page.goto('/');
-    await expect(realCards(page)).toHaveCount(shownRepos.length);
+    await expect(realCards(page)).toHaveCount(projects.length);
     await revealAll(page);
     return new AxeBuilder({ page }).withTags(WCAG);
   };
