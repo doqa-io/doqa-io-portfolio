@@ -1,0 +1,42 @@
+[
+  {
+    "name": "demo-app-portfolio",
+    "description": "React + Express CRUD app used as a QA case study: API tests (Jest, Supertest), front-end unit tests, Playwright end-to-end tests on the local app, CI on every pull request.",
+    "language": "JavaScript",
+    "category": "QA case study",
+    "repo": "https://github.com/doqa-io/demo-app-portfolio",
+    "tests": "https://github.com/doqa-io/demo-app-portfolio/actions/workflows/tests.yml"
+  },
+  {
+    "name": "doqa-io-portfolio",
+    "description": "This page. Covered by a Playwright regression suite (desktop and mobile, axe accessibility checks) that runs offline in CI.",
+    "language": "JavaScript",
+    "category": "QA case study",
+    "repo": "https://github.com/doqa-io/doqa-io-portfolio",
+    "tests": "https://github.com/doqa-io/doqa-io-portfolio/tree/main/tests"
+  },
+  {
+    "name": "playwright-sandbox",
+    "description": "Sandbox for experimenting with Playwright against a minimal PHP page deployed on doqa.io.",
+    "language": "PHP",
+    "category": "Testing",
+    "repo": "https://github.com/doqa-io/playwright-sandbox",
+    "demo": "https://doqa.io/playwright-sandbox"
+  },
+  {
+    "name": "pocketmonsterindex",
+    "description": "Home-made Pokédex built on the public PokeAPI: search with suggestions, filters by type, generation and region, infinite scroll.",
+    "language": "JavaScript",
+    "category": "Side project",
+    "repo": "https://github.com/doqa-io/pocketmonsterindex",
+    "demo": "https://doqa.io/pocketmonsterindex"
+  },
+  {
+    "name": "product-landing-page",
+    "description": "freeCodeCamp Responsive Web Design certification project: a responsive landing page for a fictional QA product.",
+    "language": "HTML",
+    "category": "Training",
+    "repo": "https://github.com/doqa-io/product-landing-page",
+    "demo": "https://doqa.io/product-landing-page"
+  }
+]

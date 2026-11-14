@@ -1,0 +1,17 @@
+{
+  "name": "doqa-io-portfolio",
+  "private": true,
+  "description": "Portfolio doqa.io — tests de non-régression Playwright",
+  "scripts": {
+    "serve": "node tests/server.mjs",
+    "test": "playwright test",
+    "test:live": "cross-env LIVE=1 playwright test",
+    "test:report": "playwright show-report"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.14.0",
+    "@playwright/test": "^1.65.0",
+    "cross-env": "^10.1.0"
+  },
+  "type": "module"
+}

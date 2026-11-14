@@ -86,44 +86,42 @@ document.addEventListener('DOMContentLoaded', () => {
     fetchRepos();
 });
 
+// Projects are curated by hand in projects.json (same origin, no third-party API).
 async function fetchRepos() {
     const grid = document.getElementById('project-grid');
-    const excludedRepos = [
-        'SVM-custom1',
-        'skills-getting-started-with-github-copilot',
-        'sample-tailwind-project'
-    ];
     try {
-        const res = await fetch('https://api.github.com/users/doqa-io/repos?per_page=100');
-        const repos = await res.json();
-        const filtered = repos.filter(repo => !excludedRepos.includes(repo.name));
+        const res = await fetch('projects.json');
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const projects = await res.json();
         grid.innerHTML = '';
 
-        if (filtered.length === 0) {
+        if (!Array.isArray(projects) || projects.length === 0) {
             grid.innerHTML = '<p>No projects found.</p>';
             return;
         }
 
-        filtered.forEach((repo, i) => {
-            const demoUrl = `https://doqa.io/${encodeURIComponent(repo.name)}`;
-            const lang = repo.language || '';
+        projects.forEach((project, i) => {
+            const lang = project.language || '';
             const langColor = LANG_COLORS[lang] || '#888';
+            const links = [
+                ['GitHub', project.repo],
+                ['Tests', project.tests],
+                ['Live Demo', project.demo],
+            ].filter(([, url]) => url)
+                .map(([label, url]) => `<a href="${escapeHTML(url)}" target="_blank" rel="noopener">${label}</a>`)
+                .join('\n                    ');
             const card = document.createElement('div');
             card.className = 'project-card reveal';
             card.style.transitionDelay = `${i * 0.07}s`;
             card.innerHTML = `
                 <div class="project-header">
-                    <div class="project-title">${escapeHTML(repo.name)}</div>
+                    <div class="project-title">${escapeHTML(project.name)}</div>
                     ${lang ? `<span class="language-badge"><span class="language-dot" style="background:${langColor}"></span>${escapeHTML(lang)}</span>` : ''}
                 </div>
-                <div class="project-desc">${escapeHTML(repo.description || 'No description provided.')}</div>
-                <div class="project-meta">
-                    <span class="meta-item">⭐ ${repo.stargazers_count}</span>
-                    <span class="meta-item">🍴 ${repo.forks_count}</span>
-                </div>
+                <div class="project-desc">${escapeHTML(project.description || 'No description provided.')}</div>
+                ${project.category ? `<div class="project-meta"><span class="meta-item">${escapeHTML(project.category)}</span></div>` : ''}
                 <div class="project-links">
-                    <a href="${escapeHTML(repo.html_url)}" target="_blank" rel="noopener">GitHub</a>
-                    <a href="${escapeHTML(demoUrl)}" target="_blank" rel="noopener">Live Demo</a>
+                    ${links}
                 </div>
             `;
             grid.appendChild(card);
