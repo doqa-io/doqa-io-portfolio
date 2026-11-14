@@ -51,7 +51,9 @@ jobs:
     # Authentification : clé SSH si le secret SFTP_KEY existe, sinon mot de passe.
     # Le mot de passe passe par la variable LFTP_PASSWORD, jamais sur la ligne de commande.
     # Seuls les fichiers du site sont envoyés (voir EXCLUDES).
+    # Connexion impossible : échec après 2 tentatives de 20 s, au lieu de réessayer sans fin.
     - name: Push files via SFTP
+      timeout-minutes: 5
       env:
         SFTP_HOST: ${{ secrets.SFTP_HOST }}
         SFTP_PORT: ${{ secrets.SFTP_PORT }}
@@ -72,7 +74,7 @@ jobs:
         EXCLUDES="-x '^\.git/' -x '^\.github/' -x '^\.gitignore$' -x '^\.idea/' -x '^\.ddev/' \
           -x '^node_modules/' -x '^tests/' -x '^test-results/' -x '^playwright-report/' \
           -x '^package(-lock)?\.json$' -x '^playwright\.config\.' -x '^README\.md$'"
-        lftp -c "set cmd:fail-exit yes; $AUTH; mirror -R --verbose $EXCLUDES ./ /www/"
+        lftp -c "set cmd:fail-exit yes; set net:max-retries 2; set net:timeout 20; set net:reconnect-interval-base 5; $AUTH; mirror -R --verbose $EXCLUDES ./ /www/"
 
     - name: Remove deploy key
       if: always()
